@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Blob Test</title>
+</head>
+
+<body>
+  <h2>Vercel Blob Test</h2>
+
+  <input type="file" id="file" accept="image/*">
+  <br><br>
+
+  <button onclick="upload()">Upload</button>
+
+  <p id="status"></p>
+  <img id="preview" style="max-width:300px">
+
+  <script>
+    async function upload() {
+      const file = document.getElementById("file").files[0];
+
+      if (!file) {
+        alert("Choose an image");
+        return;
+      }
+
+      document.getElementById("status").textContent = "Uploading...";
+
+      const form = new FormData();
+      form.append("file", file);
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: form
+      });
+
+      const data = await response.json();
+
+      if (data.url) {
+        document.getElementById("status").innerHTML =
+          `<a href="${data.url}" target="_blank">${data.url}</a>`;
+
+        document.getElementById("preview").src = data.url;
+      } else {
+        document.getElementById("status").textContent =
+          data.error || "Upload failed";
+      }
+    }
+  </script>
+</body>
+</html>
